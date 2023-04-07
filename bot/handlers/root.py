@@ -1,32 +1,19 @@
-from telegram import Update
 from telegram.ext import (ContextTypes, CommandHandler, ConversationHandler,
                           CallbackQueryHandler, MessageHandler, filters)
-from bot.ui.keyboards import RuKeyboards
 
+from bot.handlers.start import start
 from bot.handlers.mixture import mixture_handler
+from bot.handlers.sw_to_pt import main_input_handler
+from bot.handlers.tube_setup import tube_setup_handler
 
-from bot.core.constants import CBData, BotState
+from bot.core.constants import BotState, UDataKeys
 
-
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if "REGISTERED" not in context.user_data:
-        context.user_data["REGISTERED"] = True
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text="Добро пожаловать в Equlib. По умолчанию используются следующие параметры:"
-        )
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id,
-        text="[параметры эксперимента]",
-        reply_markup=RuKeyboards.BASE
-    )
-    return BotState.BASE
 
 base_handler = ConversationHandler(
     name="Base",
     entry_points=[CommandHandler('start', start)],
     states={
-        BotState.BASE: [mixture_handler],
+        BotState.BASE: [mixture_handler, main_input_handler, tube_setup_handler],
     },
     fallbacks=[CommandHandler('start', start)],
     map_to_parent=[]

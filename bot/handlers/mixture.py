@@ -1,14 +1,14 @@
 from telegram import Update
 from telegram.ext import (ContextTypes, ConversationHandler,
                           CallbackQueryHandler, MessageHandler, filters)
-from bot.core.constants import CBData, BotState
+from bot.core.constants import CBData, BotState, UDataKeys
 
 
 async def ask_for_mixture(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.callback_query.answer()
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
-        text="Введите состав смеси в формате [соединение] [мольная доля]"
+        text=context.user_data[UDataKeys.MSG].ASK_FOR_MIXTURE.value
     )
     return BotState.READ_MIXTURE
 
@@ -17,7 +17,9 @@ async def read_mixture(update: Update, context: ContextTypes.DEFAULT_TYPE):
     mixture = update.message.text
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
-        text="Новая смесь:" + mixture
+        text=context.user_data[UDataKeys.MSG].MIXTURE_CONFIRMATION.value.format(
+            mixture=mixture
+        )
     )
     return BotState.END
 
