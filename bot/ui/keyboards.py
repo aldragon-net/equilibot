@@ -19,6 +19,10 @@ ru_cancel_markup = InlineKeyboardMarkup(
     [[InlineKeyboardButton(ru.CANCEL, callback_data=CBData.CANCEL)]]
 )
 
+ru_ok_markup = InlineKeyboardMarkup(
+    [[InlineKeyboardButton(ru.OK, callback_data=CBData.CANCEL)]]
+)
+
 ru_use_velocity = InlineKeyboardMarkup(
     [[InlineKeyboardButton(ru.CANCEL, callback_data=CBData.CANCEL)],
      [InlineKeyboardButton(ru.USE_VELOCITY, callback_data=CBData.VELOCITY)]
@@ -40,7 +44,7 @@ ru_use_time = InlineKeyboardMarkup(
 ru_choose_parameter = InlineKeyboardMarkup(
     [[InlineKeyboardButton(ru.LENGTH, callback_data=CBData.LENGTH),
      InlineKeyboardButton(ru.TEMPERATURE, callback_data=CBData.TEMPERATURE)],
-     [InlineKeyboardButton(ru.CANCEL, callback_data=CBData.CANCEL)]
+     [InlineKeyboardButton(ru.BACK, callback_data=CBData.CANCEL)]
      ]
 )
 
@@ -51,3 +55,4 @@ class RuKeyboards:
     USE_VELOCITY = ru_use_velocity
     USE_TIME = ru_use_time
     CHOOSE_PARAMETER = ru_choose_parameter
+    OK = ru_ok_markup

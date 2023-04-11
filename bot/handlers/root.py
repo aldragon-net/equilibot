@@ -1,12 +1,11 @@
-from telegram.ext import (ContextTypes, CommandHandler, ConversationHandler,
-                          CallbackQueryHandler, MessageHandler, filters)
+from telegram.ext import CommandHandler, ConversationHandler
 
 from bot.handlers.start import start
 from bot.handlers.mixture import mixture_handler
 from bot.handlers.sw_to_pt import main_input_handler
 from bot.handlers.tube_setup import tube_setup_handler
 
-from bot.core.constants import BotState, UDataKeys
+from bot.core.constants import BotState
 
 
 base_handler = ConversationHandler(

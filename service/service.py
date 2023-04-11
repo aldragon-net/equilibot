@@ -86,8 +86,3 @@ def isw_rsw_parameters(data: SWProblem) -> SWSolution:
                         a_5=a_5,
                         density_ratio_5=density_ratio_5)
     return result
-
-
-data = SWProblem(mixture="AR:90 O2:10", p_1=5000, T_1=300, u_isw=1000)
-
-print(isw_rsw_parameters(data))

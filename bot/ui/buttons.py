@@ -19,6 +19,7 @@ class RussianButtonTexts(str, Enum):
     SETUP = "Параметры"
     P2SW = "P4 ⇒ SW"
     SW2PT = "SW => P5/T5"
+    OK = "OK"
     CANCEL = "Отмена"
     BACK = "Назад"
     USE_VELOCITY = "Ввести скорость"

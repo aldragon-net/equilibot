@@ -3,6 +3,8 @@ from telegram.ext import (ContextTypes, ConversationHandler,
                           CallbackQueryHandler, MessageHandler, filters)
 from bot.core.constants import CBData, BotState, UDataKeys
 
+from bot.client.clients import client
+
 
 async def ask_for_mixture(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.callback_query.answer()
@@ -15,12 +17,14 @@ async def ask_for_mixture(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def read_mixture(update: Update, context: ContextTypes.DEFAULT_TYPE):
     mixture = update.message.text
+    user_id = update.message.from_user.id
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text=context.user_data[UDataKeys.MSG].MIXTURE_CONFIRMATION.value.format(
             mixture=mixture
         )
     )
+    client.update_mixture(user_id, mixture)
     return BotState.END
 
 
