@@ -15,8 +15,10 @@ class RussianMessageText(str, Enum):
     MIXTURE_CONFIRMATION = "Новая смесь: {mixture}"
     WRONG_FORMAT = "Ошибка формата данных. Повторите ввод."
     PARAMETERS = """Параметры эксперимента:
-Длина базы {length} мм. Температура {temperature} К. Смесь {mixture}."""
-    RESULT = """Параметры ударно—нагретого потока:`
+`Длина базы: {length:.0f} мм. Температура: {temperature_celsius:.0f} C ({temperature:.0f} К).
+Смесь: {mixture}`"""
+    RESULT = """Смесь `{mixture}`\.
+Параметры ударно—нагретого потока:`
 T₂ = {T_2:>4.0f} K       T₅ = {T_5:>4.0f} K
 P₂ = {p_2:>5.2f} атм    p₅ = {p_5:>5.2f} атм
 n₂ = {n_2:.1E} м⁻³  n₅ = {n_5:.1E} м⁻³

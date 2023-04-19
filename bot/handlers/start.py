@@ -1,4 +1,5 @@
 from telegram import Update
+from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 from bot.ui.keyboards import RuKeyboards
 from bot.ui.messages import RussianMessageText
@@ -13,6 +14,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         user_id = update.message.from_user.id
     else:
         user_id = update.callback_query.from_user.id
+        await update.callback_query.answer()
     if not client.is_registered(user_id):
         context.user_data[UDataKeys.MSG] = RussianMessageText
         context.user_data[UDataKeys.KBRD] = RuKeyboards
@@ -27,8 +29,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         text=context.user_data[UDataKeys.MSG].PARAMETERS.format(
             length=params.length,
             temperature=params.T_1,
+            temperature_celsius=(params.T_1 - 273),
             mixture=params.mixture
         ),
+        parse_mode=ParseMode.MARKDOWN_V2,
         reply_markup=context.user_data[UDataKeys.KBRD].BASE,
     )
     return BotState.BASE

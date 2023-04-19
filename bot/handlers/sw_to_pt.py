@@ -23,6 +23,7 @@ async def get_solution(update: Update, context: ContextTypes.DEFAULT_TYPE):
                      u_isw=context.user_data['u_isw'])
     solution = client.solve(data)
     text = context.user_data[UDataKeys.MSG].RESULT.format(
+        mixture=data.mixture,
         T_2=solution.T_2, T_5=solution.T_5,
         p_2=solution.p_2, p_5=solution.p_5,
         n_2=solution.n_2, n_5=solution.n_5,
