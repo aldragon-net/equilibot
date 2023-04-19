@@ -6,7 +6,7 @@ class RussianMessageText(str, Enum):
 По умолчанию используются следующие параметры:"""
     ASK_FOR_LENGTH = "Введите длину базы (в миллиметрах):"
     ASK_FOR_MIXTURE = """Введите новый состав смеси в формате
-[соединение 1] [мольная доля 1] [соединение 2] [мольная доля 2]…:"""
+_\[формула₁\] \[мольная доля₁\] \[формула₂\] \[мольная доля₂\]_, например: `H2 20 O2 10 Ar 70`"""
     ASK_FOR_ROOM_TEMPERATURE = "Введите начальную температуру (в Цельсиях):"
     ASK_FOR_INITIAL_PRESSURE = "Введите давление в КНД (в миллибарах):"
     ASK_FOR_SW_VELOCITY = "Введите скорость УВ (в м/c):"
@@ -14,13 +14,16 @@ class RussianMessageText(str, Enum):
     ASK_FOR_SETUP = "Выберите, какой параметр вы хотите изменить"
     MIXTURE_CONFIRMATION = "Новая смесь: {mixture}"
     WRONG_FORMAT = "Ошибка формата данных. Повторите ввод."
+    UNKNOWN_SPECIES = "❗ Неизвестный компонент в смеси"
+    WAVE_TOO_SLOW = "❗ Скорость УВ меньше скорости звука"
     PARAMETERS = """Параметры эксперимента:
-`Длина базы: {length:.0f} мм. Температура: {temperature_celsius:.0f} C ({temperature:.0f} К).
+`Длина базы: {length:.0f} мм. Температура: {temperature_celsius:.0f}°C ({temperature:.0f} К).
 Смесь: {mixture}`"""
-    RESULT = """Смесь `{mixture}`\.
+    RESULT = """Смесь `{mixture}`
+`p₁ = {p_1_mbar:.0f} мбар  T₁ = {T_1:.0f} K`
 Параметры ударно—нагретого потока:`
 T₂ = {T_2:>4.0f} K       T₅ = {T_5:>4.0f} K
-P₂ = {p_2:>5.2f} атм    p₅ = {p_5:>5.2f} атм
+p₂ = {p_2:>5.2f} атм    p₅ = {p_5:>5.2f} атм
 n₂ = {n_2:.1E} м⁻³  n₅ = {n_5:.1E} м⁻³
 u₂ = {u_isw:>4.0f} м/c     u₅ = {u_rsw:>4.0f} м/c
 M₂ = {mach_isw:.2f}         M₅ = {mach_rsw:.2f}

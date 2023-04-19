@@ -38,7 +38,7 @@ Under these operating systems:
 """
 import cantera as ct
 import numpy as np
-from sdtoolbox.thermo import soundspeed_fr
+from service.sdtoolbox.thermo import soundspeed_fr
 from scipy.integrate import solve_ivp
 
 class ZNDSys(object):

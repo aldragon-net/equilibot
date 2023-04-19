@@ -37,9 +37,12 @@ Under these operating systems:
 """
 
 import numpy as np
-from sdtoolbox.thermo import eq_state,state
+from service.sdtoolbox.thermo import eq_state, state
+from service.sdtoolbox.config import volumeBoundRatio
+from service.sdtoolbox.config import ERRFT,ERRFV
 
-def reflected_fr(gas1,gas2,gas3,UI):
+
+def reflected_fr(gas1, gas2, gas3, UI):
     """
     Calculates frozen post-reflected-shock state assumming u1 = 0.
 
@@ -59,7 +62,7 @@ def reflected_fr(gas1,gas2,gas3,UI):
 
     """
     # Lower bound on volume/density ratio (globally defined)
-    from sdtoolbox.config import volumeBoundRatio
+
         
     p2 = gas2.P
     p1 = gas1.P
@@ -104,7 +107,6 @@ def reflected_eq(gas1,gas2,gas3,UI):
 
     """
     # Lower bound on volume/density ratio (globally defined)
-    from sdtoolbox.config import volumeBoundRatio
     
     p2 = gas2.P
     p1 = gas1.P
@@ -123,14 +125,14 @@ def reflected_eq(gas1,gas2,gas3,UI):
     T3 = T2*p3*v3/(p2*v2)
 
     gas3.TPX = T3, p3, gas2.X
-    gas3 = PostReflectedShock_eq(u2, gas2,gas3);
+    gas3 = PostReflectedShock_eq(u2, gas2, gas3);
     p3 = gas3.P
-    UR = (p3-p2)/u2/rho2-u2;    
-    
-    return [p3,UR,gas3]
+    UR = (p3-p2)/u2/rho2 - u2
+
+    return [p3, UR, gas3]
 
 
-def PostReflectedShock_fr(u2,gas2,gas3):
+def PostReflectedShock_fr(u2, gas2, gas3):
     """
     Calculates frozen post-reflected-shock state for a specified shock velocity.
 
@@ -147,7 +149,6 @@ def PostReflectedShock_fr(u2,gas2,gas3):
 
     """
     # INITIALIZE ERROR VALUES (globally defined)
-    from sdtoolbox.config import ERRFT,ERRFV
 
     # CALCULATE POST-REFLECTED SHOCK STATE
     r2 = gas2.density
@@ -174,11 +175,10 @@ def PostReflectedShock_fr(u2,gas2,gas3):
             print ('Calculation did not converge for U = %.2f' % (u2))
             return
                 
-        
-        ##############################################################################################
+        #######################################################################
         # CALCULATE FH & FP FOR GUESS 1
         [FH,FP] = FHFP_reflected_fr(u2,gas3,gas2)
-        ##############################################################################################
+        #######################################################################
         # TEMPERATURE PERTURBATION
         DT = T*0.02
         Tper = T + DT
@@ -192,7 +192,7 @@ def PostReflectedShock_fr(u2,gas2,gas3):
         # ELEMENTS OF JACOBIAN
         DFHDT = (FHX-FH)/DT
         DFPDT = (FPX-FP)/DT
-        ##############################################################################################
+        #######################################################################
         # VOLUME PERTURBATION
         DV = 0.02*V
         Vper = V + DV
@@ -202,12 +202,12 @@ def PostReflectedShock_fr(u2,gas2,gas3):
         [Pper, Hper] = state(gas3,Rper,Tper)
         
         # CALCULATE FHX & FPX FOR "IO" STATE
-        [FHX,FPX] = FHFP_reflected_fr(u2,gas3,gas2)
+        [FHX, FPX] = FHFP_reflected_fr(u2, gas3, gas2)
        
         # ELEMENTS OF JACOBIAN
         DFHDV = (FHX-FH)/DV
         DFPDV = (FPX-FP)/DV
-        ##############################################################################################
+        #######################################################################
         #INVERT MATRIX
         J = DFHDT*DFPDV - DFPDT*DFHDV
         b = [DFPDV, -DFHDV, -DFPDT, DFHDT]
@@ -246,7 +246,7 @@ def PostReflectedShock_fr(u2,gas2,gas3):
     return gas3
 
 
-def PostReflectedShock_eq(u2,gas2,gas3):
+def PostReflectedShock_eq(u2, gas2, gas3):
     """
     Calculates equilibrium post-reflected-shock state for a specified shock velocity.
 
@@ -262,8 +262,6 @@ def PostReflectedShock_eq(u2,gas2,gas3):
         gas3 = gas object at equilibrium post-reflected-shock state
 
     """
-    # INITIALIZE ERROR VALUES (globally defined)
-    from sdtoolbox.config import ERRFT,ERRFV
 
     # CALCULATE POST-REFLECTED SHOCK STATE
     r2 = gas2.density
@@ -273,15 +271,15 @@ def PostReflectedShock_eq(u2,gas2,gas3):
     deltaT = 1000
     deltaV = 1000
 
-    ##################################################################################################
+    ###########################################################################
     # PRELIMINARY GUESS
     P = gas3.P
     H = gas3.enthalpy_mass
     T = gas3.T
     r = gas3.density
     V = 1/r
-    [P, H] = eq_state(gas3,r,T)
-    ##################################################################################################
+    [P, H] = eq_state(gas3, r, T)
+    ############################################################################
     # START LOOP
 
     while (abs(deltaT) > ERRFT*T or abs(deltaV) > ERRFV*V):

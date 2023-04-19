@@ -57,19 +57,19 @@ async def read_length(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def read_room_temperature(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    temperature = update.message.text
+    temperature_celsius = update.message.text
     user_id = update.message.from_user.id
     try:
-        temperature = float(temperature)
+        temperature_celsius = float(temperature_celsius)
     except ValueError:
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text=context.user_data[UDataKeys.MSG].WRONG_FORMAT.value,
         )
         return await ask_for_room_temperature(update, context)
-    await ask_for_setup(update, context)
+    temperature = temperature_celsius + 273
     client.update_temperature(user_id, temperature)
-    return BotState.CHOOSE_PARAMETER
+    return await ask_for_setup(update, context)
 
 
 tube_setup_handler = ConversationHandler(

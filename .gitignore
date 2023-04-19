@@ -103,12 +103,8 @@ celerybeat.pid
 
 # Environments
 .env
-engine/*
-!engine/Lib/
-engine/Lib/*
-!engine/Lib/site-packages/
-engine/Lib/site-packages/*
-!engine/Lib/site-packages/sdtoolbox
+engine/
+venv/
 
 # Spyder project settings
 .spyderproject
@@ -128,7 +124,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# Test mechanisms
-thermobase/*
 
 .vscode

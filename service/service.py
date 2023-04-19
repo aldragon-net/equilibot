@@ -1,12 +1,18 @@
 import cantera as ct
 
-from sdtoolbox.postshock import shk_calc
-from sdtoolbox.reflections import reflected_fr
-from sdtoolbox.thermo import soundspeed_fr
-from sdtoolbox.config import ERRFT, ERRFV
+from service.sdtoolbox.postshock import shk_calc
+from service.sdtoolbox.reflections import reflected_fr
+from service.sdtoolbox.thermo import soundspeed_fr
+from service.sdtoolbox.config import ERRFT, ERRFV
 
 from service.schemas.models import SWProblem, SWSolution
 
+
+class UnknownSpecies(Exception):
+    pass
+
+class WaveTooSlow(Exception):
+    pass
 
 def initialize_species(input_file: str) -> dict:
     all_species = ct.Species.list_from_file(input_file)
@@ -16,6 +22,8 @@ def initialize_species(input_file: str) -> dict:
 
 def create_solution(mixture, pressure, temperature) -> ct.Solution:
     specs = [component.split(':')[0] for component in mixture.split()]
+    if not all(spec in species_dict for spec in specs):
+        raise UnknownSpecies
     gas = ct.Solution(thermo='ideal-gas',
                       species=[species_dict[name] for name in specs])
     gas.TPX = temperature, pressure, mixture
@@ -43,9 +51,9 @@ species_dict = initialize_species(input_file)
 def isw_rsw_parameters(data: SWProblem) -> SWSolution:
     mixture, u_isw, p_1, T_1 = data.mixture, data.u_isw, data.p_1, data.T_1
     gas_1, gas_2, gas_5 = init_states(mixture, p_1, T_1)
+    if not sw_velocity_faster_than_sound(gas_1, u_isw):
+        raise WaveTooSlow
     mach_isw = u_isw/soundspeed_fr(gas_1)
-    print('Initial state: ' + mixture + ', P1 = {:.0f} Pa,  T1 = {:.2f} K'.format(p_1, T_1))
-    print('Incident shock speed UI = %.2f m/s, Mach %.2f' % (u_isw, mach_isw))
     # compute postshock gas state object gas_2
     gas_2 = shk_calc(u_isw, gas_2, gas_1, ERRFT, ERRFV)
     # compute reflected shock post-shock state gas_5
@@ -64,13 +72,6 @@ def isw_rsw_parameters(data: SWProblem) -> SWSolution:
     n_5 = gas_5.P / (gas_5.T * ct.boltzmann)
     u_flow = u_isw * (1 - 1/density_ratio_2)
     mach_rsw = (u_flow + u_rsw) / a_2
-    print('Frozen Post-Incident-Shock State')
-    print('T2 = %.2f K, P2 = %.2f bar' % (gas_2.T, p_2))
-    print('a2 = %.2f m/s, r2/r1 = %.2f' % (a_2, density_ratio_2))
-    print('Frozen Post-Reflected-Shock State')
-    print('T5 = %.2f K,  P5 = %.2f atm' % (gas_5.T, p_5))
-    print('a5 = %.2f m/s, r2/r1 = %.2f' % (a_5, density_ratio_5))
-    print("Reflected Wave Speed = %.2f m/s, Mach %.2f" % (u_rsw, mach_rsw))
     result = SWSolution(u_isw=u_isw,
                         mach_isw=mach_isw,
                         T_2=gas_2.T,

@@ -1,4 +1,5 @@
 from telegram import Update
+from telegram.constants import ParseMode
 from telegram.ext import (ContextTypes, ConversationHandler,
                           CallbackQueryHandler, MessageHandler, filters)
 from bot.core.constants import CBData, BotState, UDataKeys
@@ -7,7 +8,7 @@ from bot.client.clients import client
 
 
 class MixtureValidationError(Exception):
-     pass
+    pass
 
 
 def validate_mixture(mixture: str) -> str:
@@ -31,10 +32,13 @@ def validate_mixture(mixture: str) -> str:
 
 
 async def ask_for_mixture(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.callback_query.answer()
+    if update.callback_query is not None:
+        await update.callback_query.answer()
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
-        text=context.user_data[UDataKeys.MSG].ASK_FOR_MIXTURE.value
+        text=context.user_data[UDataKeys.MSG].ASK_FOR_MIXTURE.value,
+        parse_mode=ParseMode.MARKDOWN_V2,
+        reply_markup=context.user_data[UDataKeys.KBRD].CANCEL
     )
     return BotState.READ_MIXTURE
 
@@ -67,8 +71,9 @@ mixture_handler = ConversationHandler(
     states={
         BotState.READ_MIXTURE: [MessageHandler(filters.TEXT, read_mixture)]
     },
-    fallbacks=[],
+    fallbacks=[CallbackQueryHandler(start, pattern=CBData.CANCEL)],
     map_to_parent={
+        BotState.BASE: BotState.BASE,
         BotState.STOPPING: BotState.END,
         BotState.END: BotState.BASE
     }

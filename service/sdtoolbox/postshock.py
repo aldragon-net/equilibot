@@ -43,9 +43,12 @@ Under these operating systems:
 
 import cantera as ct
 import numpy as np
-from sdtoolbox.thermo import eq_state,state
+from service.sdtoolbox.thermo import eq_state, state
+from service.sdtoolbox.config import ERRFT, ERRFV
+from service.sdtoolbox.config import volumeBoundRatio
 
-def LSQ_CJspeed(x,y):
+
+def LSQ_CJspeed(x, y):
     """
     Determines least squares fit of parabola to input data
 
@@ -100,10 +103,10 @@ def LSQ_CJspeed(x,y):
         k = k + 1
     R2 = 1 - SSE/SST
 
-    return [a,b,c,R2,SSE,SST]
+    return [a, b, c, R2, SSE, SST]
 
 
-def hug_fr(x,vb,h1,P1,v1,gas):
+def hug_fr(x, vb, h1, P1, v1, gas):
     """
     Computes difference in enthalpy computed from assumed (T, V)
     state and fixed composition (frozen) hugoniot evaluation.  Used
@@ -356,8 +359,7 @@ def PostShock_fr(U1, P1, T1, q, mech):
     
     """
     # INITIALIZE ERROR VALUES
-    from sdtoolbox.config import ERRFT,ERRFV
-    
+   
     gas1 = ct.Solution(mech)
     gas  = ct.Solution(mech)
     # INTIAL CONDITIONS
@@ -387,7 +389,6 @@ def PostShock_eq(U1, P1, T1, q, mech):
 
     """
     # INITIALIZE ERROR VALUES
-    from sdtoolbox.config import ERRFT,ERRFV
     
     gas1 = ct.Solution(mech);
     gas  = ct.Solution(mech);
@@ -423,7 +424,6 @@ def shk_calc(U1, gas, gas1, ERRFT, ERRFV):
 
     """
     # Lower bound on volume/density ratio (globally defined)
-    from sdtoolbox.config import volumeBoundRatio
     
     r1 = gas1.density; V1 = 1/r1
     P1 = gas1.P; T1 = gas1.T

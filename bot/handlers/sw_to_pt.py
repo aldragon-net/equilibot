@@ -11,6 +11,8 @@ from bot.client.clients import client
 
 from bot.schemas.models import SWProblem
 
+from service.service import UnknownSpecies, WaveTooSlow
+
 
 async def get_solution(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.message is not None:
@@ -21,17 +23,25 @@ async def get_solution(update: Update, context: ContextTypes.DEFAULT_TYPE):
                      p_1=context.user_data['p_1'],
                      T_1=client.get_params(user_id).T_1,
                      u_isw=context.user_data['u_isw'])
-    solution = client.solve(data)
-    text = context.user_data[UDataKeys.MSG].RESULT.format(
-        mixture=data.mixture,
-        T_2=solution.T_2, T_5=solution.T_5,
-        p_2=solution.p_2, p_5=solution.p_5,
-        n_2=solution.n_2, n_5=solution.n_5,
-        u_isw=solution.u_isw, u_rsw=solution.u_rsw,
-        mach_isw=solution.mach_isw, mach_rsw=solution.mach_rsw,
-        a_2=solution.a_2, a_5=solution.a_5,
-        density_ratio_2=solution.density_ratio_2, density_ratio_5=solution.density_ratio_5
-    )
+    try:
+        solution = client.solve(data)
+        text = context.user_data[UDataKeys.MSG].RESULT.format(
+            mixture=data.mixture,
+            p_1_mbar=data.p_1 / 1E2,   # Pa to mbar
+            T_1=data.T_1,
+            T_2=solution.T_2, T_5=solution.T_5,
+            p_2=solution.p_2, p_5=solution.p_5,
+            n_2=solution.n_2, n_5=solution.n_5,
+            u_isw=solution.u_isw, u_rsw=solution.u_rsw,
+            mach_isw=solution.mach_isw, mach_rsw=solution.mach_rsw,
+            a_2=solution.a_2, a_5=solution.a_5,
+            density_ratio_2=solution.density_ratio_2, density_ratio_5=solution.density_ratio_5
+        )
+    except UnknownSpecies:
+        text = context.user_data[UDataKeys.MSG].UNKNOWN_SPECIES.value
+    except WaveTooSlow:
+        text = context.user_data[UDataKeys.MSG].WAVE_TOO_SLOW.value
+    print(text)
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text=text,
@@ -83,7 +93,7 @@ async def read_time(update: Update, context: ContextTypes.DEFAULT_TYPE):
             chat_id=update.effective_chat.id,
             text=context.user_data[UDataKeys.MSG].WRONG_FORMAT.value,
         )
-        return ask_for_time(update, context)
+        return await ask_for_time(update, context)
     length = client.get_params(update.message.from_user.id).length
     context.user_data['u_isw'] = length / time * 1E3
     await get_solution(update, context)
@@ -110,8 +120,10 @@ async def read_velocity(update: Update, context: ContextTypes.DEFAULT_TYPE):
             chat_id=update.effective_chat.id,
             text=context.user_data[UDataKeys.MSG].WRONG_FORMAT.value,
         )
-        return ask_for_velocity(update, context)
-    return BotState.END
+        return await ask_for_velocity(update, context)
+    context.user_data['u_isw'] = velocity
+    await get_solution(update, context)
+    return BotState.DISPLAY_RESULT
 
 
 main_input_handler = ConversationHandler(

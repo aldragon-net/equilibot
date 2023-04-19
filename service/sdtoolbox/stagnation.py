@@ -35,8 +35,8 @@ Tested with:
 Under these operating systems:
     Windows 10, Linux (Ubuntu)
 """
-from sdtoolbox.thermo import soundspeed_fr
-from sdtoolbox.znd import getThermicity
+from service.sdtoolbox.thermo import soundspeed_fr
+from service.sdtoolbox.znd import getThermicity
 import numpy as np
 from scipy.integrate import solve_ivp
 
