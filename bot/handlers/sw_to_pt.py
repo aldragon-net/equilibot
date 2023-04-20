@@ -41,7 +41,6 @@ async def get_solution(update: Update, context: ContextTypes.DEFAULT_TYPE):
         text = context.user_data[UDataKeys.MSG].UNKNOWN_SPECIES.value
     except WaveTooSlow:
         text = context.user_data[UDataKeys.MSG].WAVE_TOO_SLOW.value
-    print(text)
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text=text,

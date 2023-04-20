@@ -15,7 +15,6 @@ def validate_mixture(mixture: str) -> str:
     items = mixture.strip().split()
     if len(items) % 2 != 0:
         raise MixtureValidationError
-    print(items)
     n = len(items) // 2
     normalized_mixture = []
     for i in range(n):
